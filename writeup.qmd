@@ -1,0 +1,57 @@
+---
+title: "PPHA 30538 Final Project Writeup"
+author: "Amulya Jasti (amjamz, Sec. 4), Sitong Guo (AnthonySigmar, Sec. 4), Helen Liu (helenriv, Sec. 3)"
+date: today
+format: 
+  pdf:
+    include-in-header: 
+       text: |
+         \usepackage{fvextra}
+         \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+include-before-body:
+  text: |
+    \RecustomVerbatimEnvironment{verbatim}{Verbatim}{
+      showspaces = false,
+      showtabs = false,
+      breaksymbolleft={},
+      breaklines
+    }
+---
+
+Checklist:
+- no more than 3 pages
+- inform context to read code
+- describe research question
+- discuss approach taken and coding involved
+- discuss any weaknesses/difficulties
+- display static plots and briefly describe them
+- briefly describe Shiny app
+- discuss policy implications of findings
+- finish with discussion of directions for future work
+
+## Background
+
+
+
+## Research Questions
+
+
+
+## Approach and Coding
+
+
+
+## Weaknesses and Difficulties
+
+
+
+## Plots
+
+
+
+## Policy Implications
+
+
+
+## Future Directions
+
