@@ -1,7 +1,5 @@
 Last updated 11/17/24 by Amulya
 
-.gitignore - currently ignoring .venv
-
 data - folder with data used for code, currently empty
 pictures - folder with pictures of static graphs from code, currently empty
 shiny-app - folder with shiny app
