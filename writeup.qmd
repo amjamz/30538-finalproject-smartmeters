@@ -18,7 +18,7 @@ include-before-body:
     }
 ---
 
-Checklist:
+Checklist: **DELETE BEFORE KNITTING**
 - no more than 3 pages
 - inform context to read code
 - describe research question
@@ -30,16 +30,15 @@ Checklist:
 - finish with discussion of directions for future work
 
 ## Background
-
-
+The United Kingdom has implemented a national program to replace traditional energy meters with smart meters [1]. These meters offer more accurate information on energy usage and costs to both suppliers and households using them [1]. Consumers who have better transparency on their energy consumption along with live information on their energy spending can more accurately make decisions about how much electricity they would like to consume. This can reveal patterns like the price or income demands of elasticity. Additionally, a wide rollout of smart meters can give us a comparison between the various regions of the UK, revealing trends over space and time.
 
 ## Research Questions
-
-
+Our project aims to...
+1. Identify the seasonal, weekly, and daily peaks in energy usage.
+2. Observe correlations between socioeconomic demographics and energy usage.
 
 ## Approach and Coding
-
-
+We have limited our research to the UK Power Network (UKPN) Distribution Network Operator (DNO) and its EPN license area, East England, because of the greater data availability, diverse demographic variability, and general computing and storage limits. The data available is for the month of February 2024.
 
 ## Weaknesses and Difficulties
 
@@ -55,3 +54,8 @@ Checklist:
 
 ## Future Directions
 
+
+
+## Sources **CONVERT TO APA BEFORE KNITTING**
+1. https://www.ofgem.gov.uk/get-smart-meter#:~:text=Smart%20meters%20are%20the%20new,when%20you%20can%20get%20one.
+2. 
