@@ -1,0 +1,37 @@
+---
+title: "PPHA 30538 Final Project Plot 1"
+author: "Amulya Jasti (amjamz, Sec. 4), Sitong Guo (AnthonySigmar, Sec. 4), Helen Liu (helenriv, Sec. 3)"
+date: today
+format: 
+  pdf:
+    include-in-header: 
+       text: |
+         \usepackage{fvextra}
+         \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+include-before-body:
+  text: |
+    \RecustomVerbatimEnvironment{verbatim}{Verbatim}{
+      showspaces = false,
+      showtabs = false,
+      breaksymbolleft={},
+      breaklines
+    }
+---
+
+```{python}
+import geopandas as gpd
+import pandas as pd
+import shapely
+from shapely import wkt
+import matplotlib.pyplot as plt
+import altair as alt
+```
+
+
+Our smart meter data is from weave.energy and our shapefile data is from UK's National Energy System Operator (NESO).
+
+Step 1: Import and clean the data
+
+```{python}
+smart_meters = gpd.read_parquet("s3://weave.energy/smart-meter.parquet", filters=[("dno_alias", "==", "UKPN_EPN")])
+```
