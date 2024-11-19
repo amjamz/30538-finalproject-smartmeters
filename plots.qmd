@@ -25,13 +25,47 @@ import shapely
 from shapely import wkt
 import matplotlib.pyplot as plt
 import altair as alt
+import pyarrow
 ```
 
+```{python}
+#Can use these to change paths easily
+aj_path = "C:/Users/amuly/OneDrive/Documents/GitHub/30538-finalproject-smartmeters/"
+sg_path = "Sitong's basepath"
+hl_path = "Helen's basepath"
+current_path = aj_path
+```
 
 Our smart meter data is from weave.energy and our shapefile data is from UK's National Energy System Operator (NESO).
 
 Step 1: Import and clean the data
 
-```{python}
-smart_meters = gpd.read_parquet("s3://weave.energy/smart-meter.parquet", filters=[("dno_alias", "==", "UKPN_EPN")])
+Source: https://github.com/centre-for-ai-and-climate/lv-feeder-smart-meter-data/blob/main/2024-02-12-aggregated-by-substation.csv.gz
+
+```{python} 
+#| eval: false
+
+#import data aggregated by substation, and only select substations from UKPN
+substations = pd.read_csv(r"C:\Users\amuly\Downloads\2024-02-12-aggregated-by-substation.csv\2024-02-12-aggregated-by-substation.csv")
+substations_UKPN = substations[substations['substation'].str.startswith('UKPN', na=False)]
 ```
+
+```{python}
+#| eval: false
+
+#save as CSV so partners can use it
+substations_UKPN.to_csv("C:/Users/amuly/OneDrive/Documents/GitHub/30538-finalproject-smartmeters/data/substations_UKPN.csv", index=False)
+```
+
+```{python}
+substations_UKPN = pd.read_csv(current_path+'data/substations_UKPN.csv')
+substations_UKPN.head()
+substations_UKPN.shape
+```
+
+Each of the 40,270 observations is unique by substation and timestamp (every half hour) combination, with the following columns:
+- substation: specific substation of the observation
+- consumption: consumption in the past half-hour period
+- timestamp: date and half-hour mark, in datetime format
+- latitude: latitude
+- longitude: longitude
