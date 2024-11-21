@@ -23,9 +23,12 @@ import geopandas as gpd
 import pandas as pd
 import shapely
 from shapely import wkt
+from shapely.geometry import Point
 import matplotlib.pyplot as plt
+import contextily as cx
 import altair as alt
 import pyarrow
+from 
 ```
 
 ```{python}
@@ -58,9 +61,19 @@ substations_UKPN.to_csv("C:/Users/amuly/OneDrive/Documents/GitHub/30538-finalpro
 ```
 
 ```{python}
+#import data
 substations_UKPN = pd.read_csv(current_path+'data/substations_UKPN.csv')
-substations_UKPN.head()
-substations_UKPN.shape
+
+#add new time columns to analyze
+substations_UKPN['timestamp'] = pd.to_datetime(substations_UKPN['timestamp'])
+substations_UKPN['date'] = substations_UKPN['timestamp'].dt.date
+substations_UKPN['day_of_week'] = substations_UKPN['timestamp'].dt.day_name()
+substations_UKPN['time_of_day'] = substations_UKPN['timestamp'].dt.time
+
+#set up as a gdf
+substations_UKPN['geometry'] = substations_UKPN.apply(lambda row: Point(row['longitude'], row['latitude']), axis=1)
+substations_UKPN_gdf = gpd.GeoDataFrame(substations_UKPN, geometry='geometry')
+substations_UKPN_gdf = substations_UKPN_gdf.set_crs("EPSG:4326", inplace=True)
 ```
 
 Each of the 40,270 observations is unique by substation and timestamp (every half hour) combination, with the following columns:
@@ -69,3 +82,47 @@ Each of the 40,270 observations is unique by substation and timestamp (every hal
 - timestamp: date and half-hour mark, in datetime format
 - latitude: latitude
 - longitude: longitude
+- geometry: long and lat that gpd can interpret
+- date: YYYY-MM-DD
+- day_of_week: day of week in English (i.e. Monday, Tuesday, ...)
+- time_of_day: HH:MM:SS (still in half hour intervals so either HH:00:00 or HH:30:00)
+
+
+```{python}
+#sample code: plot all substations' consumptions for 2024-02-12 00:30:00
+ax = substations_UKPN_gdf[substations_UKPN_gdf['timestamp'] == '2024-02-12 00:30:00'].plot(marker='o', markersize=3, column="consumption", cmap='magma', legend="true", legend_kwds={"label": "Total Consumption Active Import (kWh) on 2/12/24 at 12:30AM"}, figsize=(10, 6))
+cx.add_basemap(ax, crs=substations_UKPN_gdf.crs.to_string(), source=cx.providers.CartoDB.Voyager, attribution=False) # adds basemap of UK
+plt.show()
+```
+
+
+```{python}
+#sample code: asked ChatGPT for a version of the above code that shows average consumption overall by substation:
+
+avg_consumption_by_substation = substations_UKPN_gdf.groupby('substation')['consumption'].mean().reset_index()
+
+# Merge the average consumption with the original GeoDataFrame based on the substation
+substations_UKPN_gdf_avg = substations_UKPN_gdf.merge(avg_consumption_by_substation[['substation', 'consumption']], on='substation', suffixes=('', '_avg'))
+
+# Step 2: Plot the average consumption by substation
+ax = substations_UKPN_gdf_avg.plot(
+    marker='o', 
+    markersize=3, 
+    column='consumption_avg',  # Use the average consumption
+    cmap='magma', 
+    legend=True, 
+    legend_kwds={"label": "Average Consumption Active Import (kWh) by Substation"},
+    figsize=(10, 6)
+)
+
+# Add basemap of the UK
+cx.add_basemap(
+    ax, 
+    crs=substations_UKPN_gdf.crs.to_string(), 
+    source=cx.providers.CartoDB.Voyager, 
+    attribution=False
+)
+
+# Show the plot
+plt.show()
+```
