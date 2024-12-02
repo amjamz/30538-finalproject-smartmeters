@@ -35,10 +35,10 @@ The United Kingdom has implemented a national program to replace traditional ene
 ## Research Questions
 Our project aims to...
 1. Identify the seasonal, weekly, and daily peaks in energy usage.
-2. Observe correlations between socioeconomic demographics and energy usage.
+2. Sequentially, determine how those peaks can be curbed with peak pricing.
 
 ## Approach and Coding
-We have limited our research to the UK Power Network (UKPN) Distribution Network Operator (DNO) and its EPN license area, East England, because of the greater data availability, diverse demographic variability, and general computing and storage limits. The data available is for the month of February 2024.
+We have limited our research to the UK Power Network (UKPN) Distribution Network Operator (DNO) and its EPN license area of Bedford/Cambridge smart meters because of the greater data availability, diverse demographic variability, and general computing and storage limits. The data available is for the month of February 2024.
 
 ## Weaknesses and Difficulties
 
