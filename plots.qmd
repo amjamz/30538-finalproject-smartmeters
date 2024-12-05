@@ -78,6 +78,7 @@ substations_UKPN_gdf = substations_UKPN_gdf.set_crs("EPSG:4326", inplace=True)
 Filtered to the Bedford/Cambridge region. Source: https://ukpowernetworks.opendatasoft.com/explore/dataset/ukpn-epn-area-operational-boundaries/information/
 
 ```{python}
+epn_boundaries = gpd.read_file(current_path + "/data/ukpn-epn-area-operational-boundaries/ukpn-epn-area-operational-boundaries.shp")
 bedford_cambridge = epn_boundaries[epn_boundaries['ops_area'] == 'Bedford/Cambridge']
 
 # Spatial join to filter to substations from Bedford/Cambridge region
@@ -158,7 +159,7 @@ cx.add_basemap(
 plt.show()
 ```
 
-Step 3: Cre
+Step 3: Create time template for Shiny App
 ```{python}
 #sample code: plot all substations' consumptions for 2024-02-12 00:30:00
 time = '2024-02-12 00:30:00' #between this and end of 2024-02-29
