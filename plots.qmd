@@ -117,7 +117,14 @@ bedford_cambridge_substations = epn_substation_boundaries.merge(
     suffixes=('_boundaries', '_substations')  # Suffixes for overlapping column names
 )
 
+#reassign geometry
 bedford_cambridge_substations_gdf = gpd.GeoDataFrame(bedford_cambridge_substations, geometry='geometry_boundaries')
+bedford_cambridge_substations_gdf.rename(columns={'geometry': 'old_geometry'}, inplace=True)
+```
+
+```{python}
+#| eval: false
+pd.DataFrame(bedford_cambridge_substations).to_csv(current_path + "data/bedford-cambridge-substations.csv")
 ```
 
 Each of the observations in bedford_cambridge_substations_gdf is unique by substation and timestamp (every half hour) combination, with the following columns:
@@ -166,4 +173,26 @@ time = '2024-02-12 00:30:00' #between this and end of 2024-02-29
 ax = bedford_cambridge_substations_gdf[bedford_cambridge_substations_gdf['timestamp'] == time].plot(marker='o', markersize=3, column="consumption", cmap='magma', legend="true", legend_kwds={"label": "Total Consumption Active Import (kWh) on 2/12/24 at 12:30AM"}, figsize=(10, 6))
 cx.add_basemap(ax, crs=bedford_cambridge_substations_gdf.crs.to_string(), source=cx.providers.CartoDB.Voyager, attribution=False) # adds basemap of UK
 plt.show()
+```
+
+Step 4: Graph average by time of day
+
+```{python}
+alt.data_transformers.disable_max_rows()
+average_consumption = substations_UKPN.groupby('time_of_day')['consumption'].mean().reset_index()
+average_consumption['time_of_day'] = pd.to_datetime(average_consumption['time_of_day'], format='%H:%M:%S').dt.strftime('%H:%M:%S')
+
+plot = alt.Chart(average_consumption).mark_line().encode(
+    x=alt.X('time_of_day:N', title='Time of Day', axis=alt.Axis(labelAngle=-45, labelOverlap="greedy")),
+    y=alt.Y('consumption:Q', title='Average Consumption')
+).properties(
+        width=900, #adjusted width to fit all labels
+        title=f'Average Consumption by Time of Day across all UK Smart Meters'
+    )
+plot
+```
+
+```{python}
+#| eval: false
+plot.save(current_path + 'pictures/plot1.png')
 ```
