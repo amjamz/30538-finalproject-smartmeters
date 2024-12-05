@@ -117,7 +117,14 @@ bedford_cambridge_substations = epn_substation_boundaries.merge(
     suffixes=('_boundaries', '_substations')  # Suffixes for overlapping column names
 )
 
+#reassign geometry
 bedford_cambridge_substations_gdf = gpd.GeoDataFrame(bedford_cambridge_substations, geometry='geometry_boundaries')
+bedford_cambridge_substations_gdf.rename(columns={'geometry': 'old_geometry'}, inplace=True)
+```
+
+```{python}
+#| eval: false
+pd.DataFrame(bedford_cambridge_substations).to_csv(current_path + "data/bedford-cambridge-substations.csv")
 ```
 
 Each of the observations in bedford_cambridge_substations_gdf is unique by substation and timestamp (every half hour) combination, with the following columns:
