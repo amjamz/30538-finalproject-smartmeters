@@ -34,45 +34,60 @@ The United Kingdom has implemented a national program to replace traditional ene
 
 ## Research Questions
 Our project aims to...
-1. Identify the daily peaks in energy usage.
-2. Sequentially, determine where those peaks can be curbed with peak pricing.
+1. Identify the seasonal, weekly, and daily peaks in energy usage.
+2. Sequentially, determine how those peaks can be curbed with peak pricing.
 
 ## Approach and Coding
-We coded by aggregating the data in various ways to view consumption trends. Our primary focus was visualizing who consumes the most and when.
-
-We have limited our geographic display to the UK Power Network (UKPN) Distribution Network Operator (DNO) and its EPN license area of Bedford/Cambridge smart meters because of the greater data availability and general computing and storage limits. The data available is for the month of February 2024.
+We have limited our research to the UK Power Network (UKPN) Distribution Network Operator (DNO) and its EPN license area of Bedford/Cambridge smart meters because of the greater data availability, diverse demographic variability, and general computing and storage limits. The data available is for the month of February 2024.
 
 ## Weaknesses and Difficulties
-Some major weaknesses were in lack of data, especially as shown in the geo plots where there are gaps in substations. These are missing either because the EPN does not have smartmeters there or the population is too small to share the data for privacy reasons.
+1.Limited Temporal Scope:The study focuses only on February 2024, which may not capture seasonal variations in energy consumption (e.g., summer vs. winter demand). This limits the generalizability of findings related to annual trends.
 
-We addressed this by focusing on urban areas, where there is more data (although incomplete) and more consumers.
+2.Data Granularity:Depending on the granularity of smart meter data (e.g., half-hour intervals), the dataset might lack detail to fully capture micro-trends like sudden surges or drops in energy consumption.
+
+3.Lack of Real-Time Pricing Data:If real-time electricity pricing data is not incorporated, the study may not accurately assess the impact of peak pricing on curbing energy consumption
+
 
 ## Plots
+plot1:
+The plot shows the average energy consumption by time of day across all UK smart meters over a 24-hour period (from February 12, 2024, 00:30:00 to February 13, 2024, 00:00:00).
 
-Plot 1 shows the trends in consumption by time of day. The largest peak is in the evening hours.
+The data highlights two clear peaks: one in the morning (07:00–08:00) and another in the evening (19:00).
 
-![](pictures/plot1.png){ width=60% fig-align="center"}
+The evening peak is much higher than the morning peak, suggesting that evenings are the most energy-intensive part of the day in the UK.
 
+plot2:
 
-Plot 2 shows a sample of our Shiny dashboard, which allows one to visualize consumption by time of day in the Bedford/Cambridge region.
+The plot shows regional energy consumption trends for the Bedford/Cambridge region on 2024-02-12 at 18:30:00 (half-hour intervals). Here's an interpretation of the plot:
 
-![](pictures/plot2.jpg){ width=60% fig-align="center"}
+Redder areas represent higher energy consumption (closer to 1200 kWh), while bluer areas indicate lower consumption levels.
 
+Regional Focus:The map is centered on the Bedford/Cambridge region, with energy consumption data visualized geographically.
 
-Plot 3 shows average consumption by substation overall, indicating where might be the locations primarily affected by peak pricing.
+Certain areas (possibly urban centers) have visibly higher energy consumption (darker red regions).
 
-![](pictures/plot3.png){ width=60% fig-align="center"}
-
+The interactive slider provides a way to explore how energy demand shifts regionally over time.The slider at the top allows users to select different times throughout the day (00:30 to 24:00) to observe changes in consumption trends dynamically.
 
 ## Policy Implications
+1.Smart meters provide households with transparent, real-time energy usage data, which can encourage energy-efficient behaviors. Policymakers can leverage this to design targeted educational campaigns promoting energy conservation.
 
+2.Regional Equity in Energy Policies:By comparing energy consumption across regions, policymakers can tailor subsidies or programs to assist low-income households that may struggle to adapt to peak pricing models.
+
+3.Improved Demand Forecasting:Insights from smart meter data can enhance the accuracy of demand forecasting, helping energy suppliers plan more efficiently and reduce reliance on non-renewable backup power.
 
 
 ## Future Directions
+1.Expand Temporal and Regional Scope:Extend the analysis to include other seasons (e.g., summer, fall) and other regions in the UK to capture broader patterns in energy consumption.
+
+2.We should incorporate real-time electricity pricing data to analyze the elasticity of demand and estimate the effectiveness of peak pricing in reducing energy consumption.
+
+3.Explore the integration of smart meter data with renewable energy production patterns to assess how households can optimize energy consumption when renewable sources are abundant.
+
+4.simulate how changes in peak pricing or energy policies might influence consumption patterns over the long term and study the impact of peak pricing on low-income households and explore policies to ensure affordability and equitable access to energy.
+
+5.And then investigate the barriers to smart meter adoption in areas with lower penetration rates and develop strategies to increase usage.
 
 
-
-## Sources
+## Sources **CONVERT TO APA BEFORE KNITTING**
 1. https://www.ofgem.gov.uk/get-smart-meter#:~:text=Smart%20meters%20are%20the%20new,when%20you%20can%20get%20one.
-2. https://www.theecoexperts.co.uk/solar-panels/kwh-electricity-prices
-3. https://doi.org/10.1016/j.enbuild.2023.113869
+2. 
