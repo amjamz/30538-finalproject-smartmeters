@@ -33,7 +33,7 @@ import pyarrow
 ```{python}
 #Can use these to change paths easily
 aj_path = "C:/Users/amuly/OneDrive/Documents/GitHub/30538-finalproject-smartmeters/"
-sg_path = "Sitong's basepath"
+sg_path = "C:/Users/RedthinkerDantler/Documents/GitHub/DPPP2/30538-finalproject-smartmeters/"
 hl_path = "Helen's basepath"
 current_path = aj_path
 ```
