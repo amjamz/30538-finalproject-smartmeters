@@ -194,5 +194,5 @@ plot
 
 ```{python}
 #| eval: false
-save(plot, current_path + 'plots/average_consumption_plot.png', scale=2.0)
+save(plot, current_path + 'pictures/average_consumption_plot.png', scale=2.0)
 ```
