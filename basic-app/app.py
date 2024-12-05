@@ -1,43 +1,43 @@
 import pandas as pd
 import geopandas as gpd
-import altair as alt
 import json
 from shapely.geometry import Point
 from shiny import App, render, ui, reactive
-from shinywidgets import output_widget, render_altair
 from datetime import datetime
+import matplotlib.pyplot as plt
+import contextily as cx
+from matplotlib.figure import Figure
 
+aj_path = "C:/Users/amuly/OneDrive/Documents/GitHub/30538-finalproject-smartmeters/"
 sg_path = "C:/Users/RedthinkerDantler/Documents/GitHub/DPPP2/30538-finalproject-smartmeters/"
-current_path = sg_path
+hl_path = "Helen's basepath"
+current_path = aj_path
 
+# Load and preprocess data
 substations_UKPN = pd.read_csv(current_path + 'data/substations_UKPN.csv')
-
 substations_UKPN['timestamp'] = pd.to_datetime(substations_UKPN['timestamp'])
 substations_UKPN['date'] = substations_UKPN['timestamp'].dt.date
 substations_UKPN['day_of_week'] = substations_UKPN['timestamp'].dt.day_name()
 substations_UKPN['time_of_day'] = substations_UKPN['timestamp'].dt.time
-
-# Set up GeoDataFrame
 substations_UKPN['geometry'] = substations_UKPN.apply(lambda row: Point(row['longitude'], row['latitude']), axis=1)
-substations_UKPN_gdf = gpd.GeoDataFrame(substations_UKPN, geometry='geometry')
-substations_UKPN_gdf = substations_UKPN_gdf.set_crs("EPSG:4326", inplace=True)
 
-# Load Bedford/Cambridge boundary data
+# Create GeoDataFrame
+substations_UKPN_gdf = gpd.GeoDataFrame(substations_UKPN, geometry='geometry')
+substations_UKPN_gdf.set_crs("EPSG:4326", inplace=True)
+
+# Load boundary data
 epn_boundaries = gpd.read_file(current_path + 'data/ukpn-epn-area-operational-boundaries/ukpn-epn-area-operational-boundaries.shp')
 bedford_cambridge = epn_boundaries[epn_boundaries['ops_area'] == 'Bedford/Cambridge']
 
-# Spatial join to filter substations within Bedford/Cambridge region
+# Spatial join
 bedford_cambridge_substations = gpd.sjoin(
-    substations_UKPN_gdf,  # Substation GeoDataFrame
-    bedford_cambridge,     # Bedford/Cambridge region GeoDataFrame
+    substations_UKPN_gdf,
+    bedford_cambridge,
     how='inner',
     predicate='within'
 )
 
-# Clean substation column
 bedford_cambridge_substations['substation'] = bedford_cambridge_substations['substation'].apply(lambda s: s[9:])
-
-# Load substation boundary data
 epn_substation_boundaries = gpd.read_file(current_path + "data/ukpn_secondary_postcode_area/ukpn_secondary_postcode_area.shp").rename(columns={
     "dno": "DNO",
     "sitefunctio": "site_functional_location",
@@ -49,51 +49,31 @@ epn_substation_boundaries = gpd.read_file(current_path + "data/ukpn_secondary_po
     "customer_co": "customer_count"
 })
 
-# Merge on substation and site_functional_location columns
 bedford_cambridge_substations = epn_substation_boundaries.merge(
-    bedford_cambridge_substations, 
-    left_on="site_functional_location", 
-    right_on="substation", 
-    how="inner", 
+    bedford_cambridge_substations,
+    left_on="site_functional_location",
+    right_on="substation",
+    how="inner",
     suffixes=('_boundaries', '_substations')
 )
 
 bedford_cambridge_substations_gdf = gpd.GeoDataFrame(bedford_cambridge_substations, geometry='geometry_boundaries')
 
-# Time related options slider
+# Time slider options
 time_options = (
     bedford_cambridge_substations_gdf[["date", "time_of_day"]]
     .drop_duplicates()
     .sort_values(["date", "time_of_day"])
 )
-
 time_options["time_label"] = time_options["date"].astype(str) + " " + time_options["time_of_day"].astype(str)
 time_labels = time_options["time_label"].tolist()
-
-# convert Gdf to geojson
-def geojson_from_gdf(gdf):
-    """
-    Convert a GeoDataFrame to GeoJSON format. Ensures that Point geometries are serialized correctly.
-    """
-    # correct CRS
-    gdf = gdf.to_crs(epsg=4326) 
-    
-    # if the geometry exists
-    if 'geometry_boundaries' not in gdf.columns:
-        print("Error: Geometry column 'geometry_boundaries' not found.")
-        return {}
-
-    # serialize geometries (Point geometries for geojson
-    gdf['geometry'] = gdf['geometry_boundaries'].apply(lambda geom: {'type': 'Point', 'coordinates': [geom.centroid.x, geom.centroid.y]})
-    geojson_data = json.loads(gdf.to_json())  # Convert to GeoJSON format
-    return geojson_data
 
 # UI
 app_ui = ui.page_fluid(
     ui.h2("Smart Meter Energy Consumption: Bedford/Cambridge Region"),
     ui.input_slider(
         "time_slider",
-        "Select Time (Date and Time of Day)",
+        "Half Hour Intervals from 00:30 to 24:00",
         min=0,
         max=len(time_labels) - 1,
         value=0,
@@ -103,7 +83,7 @@ app_ui = ui.page_fluid(
         width="100%",
     ),
     ui.tags.div(ui.output_text("current_time"), style="font-size:16px; font-weight: bold;"),
-    output_widget("consumption_map", height="600px"),
+    ui.output_plot("consumption_map"),
 )
 
 def server(input, output, session):
@@ -112,73 +92,100 @@ def server(input, output, session):
         selected_time = time_labels[input.time_slider()]
         selected_date, selected_time_of_day = selected_time.split(" ")
 
-        print(f"Selected Date: {selected_date}, Selected Time of Day: {selected_time_of_day}")
-
-        # ensure date is in datetime forma
-        bedford_cambridge_substations_gdf['date'] = pd.to_datetime(bedford_cambridge_substations_gdf['date']).dt.date
-
-        # convert the selected_time_of_day to datetime.time format
-        selected_time_of_day = datetime.strptime(selected_time_of_day, "%H:%M:%S").time()
-
-        # check if the filtering will work
-        print(f"Unique Dates in DataFrame: {bedford_cambridge_substations_gdf['date'].unique()}")
-        print(f"Unique Time of Day in DataFrame: {bedford_cambridge_substations_gdf['time_of_day'].unique()}")
-
-        # Filter : selected date and time
-        filtered_df = bedford_cambridge_substations_gdf[
-            (bedford_cambridge_substations_gdf["date"] == pd.to_datetime(selected_date).date())  # Match date format
-            & (bedford_cambridge_substations_gdf["time_of_day"] == selected_time_of_day)  # Match time format
+        # Filter data by date and time
+        filtered_df = bedford_cambridge_substations_gdf[(
+            bedford_cambridge_substations_gdf["date"] == pd.to_datetime(selected_date).date()) &
+            (bedford_cambridge_substations_gdf["time_of_day"] == datetime.strptime(selected_time_of_day, "%H:%M:%S").time())
         ]
-        
-        # Check if filtered data is empty
-        if filtered_df.empty:
-            print(f"No data available for {selected_date} {selected_time_of_day}")
-        else:
-            print(f"Filtered Data (first 5 rows): \n{filtered_df.head()}")
 
-        # ensure filtered DataFrame still has the geometry column and is a valid GeoDataFrame
-        if filtered_df.empty:
-            return filtered_df
-        
-        filtered_df = filtered_df.copy()  
-        filtered_df = filtered_df.set_geometry('geometry_boundaries') 
-        
-        # the average consumption for the selected time
-        avg_consumption = filtered_df['consumption'].mean()
-        
-        # update ui with the average consumption value 
-        output.current_time = f"Selected Time: {selected_date} {selected_time_of_day} | Average Consumption: {avg_consumption:.2f} kWh"
-        
+        # Convert datetime to string for JSON serialization
+        filtered_df["date"] = filtered_df["date"].astype(str)
+        filtered_df["time_of_day"] = filtered_df["time_of_day"].astype(str)
         return filtered_df
 
     @output
-    @render_altair
-    def consumption_map():
-        filtered_df = filtered_data() 
-        
-        # If filtered data is empty, skip rendering
+    @render.ui
+    def current_time():
+        selected_time = time_labels[input.time_slider()]
+        selected_date, selected_time_of_day = selected_time.split(" ")
+
+        filtered_df = filtered_data()
         if filtered_df.empty:
-            return alt.Chart().mark_text().encode(
-                text=alt.value('No data available for this time')
-            )
+            return f"Selected Time: {selected_date} {selected_time_of_day} | No data available."
 
-        #from filtered gdf
-        geojson_data = geojson_from_gdf(filtered_df)
+        avg_consumption = filtered_df['consumption'].mean()
+        return f"Selected Time: {selected_date} {selected_time_of_day} | Avg Consumption: {avg_consumption:.2f} kWh"
 
-        # ensure GeoJSON is not empty
-        if not geojson_data:
-            return alt.Chart().mark_text().encode(
-                text=alt.value('Error in GeoJSON generation')
-            )
+    @output
+    @render.plot
+    def consumption_map():
+        filtered_df = filtered_data()
 
-        chart = alt.Chart(geojson_data).mark_geoshape().encode(
-            color='consumption:Q',  # Map consumption to color
-            tooltip=['substation:N', 'consumption:Q', 'date:T', 'time_of_day:T']
-        ).properties(
-            width=600,
-            height=400
+        # Handle empty filtered data
+        if filtered_df.empty:
+            fig = plt.figure(figsize=(6, 6))
+            ax = fig.add_subplot(111)
+            ax.text(0.5, 0.5, "No data available", ha="center", va="center", fontsize=14)
+            return fig
+
+        # Ensure CRS alignment
+        if not bedford_cambridge.crs.equals(filtered_df.crs):
+            filtered_df = filtered_df.to_crs(bedford_cambridge.crs)
+
+        # Create plot
+        fig, ax = plt.subplots(figsize=(12, 10))
+
+        # Plot boundaries
+        bedford_cambridge.boundary.plot(ax=ax, color="blue", linewidth=0.5, label="Boundaries")
+
+        # Plot substations with consumption data
+        filtered_df.plot(
+            ax=ax,
+            marker="o",
+            markersize=3,
+            column="consumption",
+            cmap="coolwarm",
+            legend=True,
+            legend_kwds={"label": "Consumption (kWh)"},
         )
 
-        return chart
+        # Add basemap
+        cx.add_basemap(
+            ax,
+            crs=bedford_cambridge.crs.to_string(),
+            source=cx.providers.CartoDB.Voyager,
+            attribution=False,
+        )
+
+        # Add average consumption annotation
+        avg_consumption = filtered_df["consumption"].mean()
+        ax.annotate(
+            f"Avg Consumption: {avg_consumption:.2f} kWh",
+            xy=(0.5, 0.95),
+            xycoords="axes fraction",
+            fontsize=12,
+            ha="center",
+            color="darkred",
+            bbox=dict(boxstyle="round,pad=0.3", facecolor="white", edgecolor="darkred"),
+        )
+
+        # Set title with current time
+        selected_time = time_labels[input.time_slider()]
+        ax.set_title(f"Energy Consumption on {selected_time}", fontsize=14)
+
+        # Set the zoom region based on the substation locations
+        lat_min, lat_max = filtered_df['geometry_substations'].y.min(), filtered_df['geometry_substations'].y.max()
+        lon_min, lon_max = filtered_df['geometry_substations'].x.min(), filtered_df['geometry_substations'].x.max()
+        ax.set_xlim(lon_min - 0.01, lon_max + 0.01)  # Adjust bounds to zoom in
+        ax.set_ylim(lat_min - 0.01, lat_max + 0.01)
+
+        ax.set_xlabel("Longitude", fontsize=12)
+        ax.set_ylabel("Latitude", fontsize=12)
+
+        plt.subplots_adjust(left=0.4)  # move plot left
+
+        ax.set_aspect('equal', 'box')
+
+        return fig
 
 app = App(app_ui, server)
