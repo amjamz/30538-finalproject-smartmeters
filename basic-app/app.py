@@ -11,7 +11,7 @@ from matplotlib.figure import Figure
 aj_path = "C:/Users/amuly/OneDrive/Documents/GitHub/30538-finalproject-smartmeters/"
 sg_path = "C:/Users/RedthinkerDantler/Documents/GitHub/DPPP2/30538-finalproject-smartmeters/"
 hl_path = "Helen's basepath"
-current_path = aj_path
+current_path = sg_path
 
 # Load and preprocess data
 substations_UKPN = pd.read_csv(current_path + 'data/substations_UKPN.csv')
