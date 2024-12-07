@@ -6,8 +6,8 @@ data/ukpn_secondary_postcode_area - folder with shapefile of secondary substatio
 data/ukpn-epn-area-operational-boundaries - folder with shapefile of EPN region boundaries
 
 pictures - folder with pictures of static graphs from code
-shiny-app - folder with shiny app
-shiny-app/app.py - shiny dashboard with plot2
+basic-app (the shiny-app) - folder with shiny app
+basic-app/app.py - shiny dashboard with plot2
 writeup.qmd - write up and codes for final project
 final_writeup.pdf - the final version of writeup in pdf
 writeup.html - the final version of the writeup in html
