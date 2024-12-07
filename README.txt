@@ -1,4 +1,5 @@
 Last updated 12/7/24 by Sitong
+**Amulya Jasti(sec.4), Sitong Guo(sec.4), Helen Liu(sec.3)**
 
 data - folder with data used for code
 data/dno_license_areas_20200506 - folder with shapefile of Distribution Network Operators (DNOs) aka energy provider boundaries in Great Britain, downloaded from the UK National Energy System Operator (NESO): https://www.neso.energy/data-portal/gis-boundaries-gb-dno-license-areas
