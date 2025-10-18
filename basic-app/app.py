@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import contextily as cx
 from matplotlib.figure import Figure
 
+<<<<<<< HEAD
 current_path = "C:/Users/amuly/OneDrive/Documents/GitHub/30538-finalproject-smartmeters/"
 
 ## First, data is cleaned below. Shiny App code begins on line 67.
