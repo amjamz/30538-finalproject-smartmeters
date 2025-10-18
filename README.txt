@@ -12,4 +12,3 @@ plots.qmd - contains all code for generating static plots shown in pictures fold
 writeup.qmd - write up for final project
 Presentation.pptx - slides for final presentation
 requirements.txt - necessary packages
-commit_history.txt - shows that I did majority of the work lol
