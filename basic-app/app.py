@@ -8,10 +8,9 @@ import matplotlib.pyplot as plt
 import contextily as cx
 from matplotlib.figure import Figure
 
-aj_path = "C:/Users/amuly/OneDrive/Documents/GitHub/30538-finalproject-smartmeters/"
-sg_path = "C:/Users/RedthinkerDantler/Documents/GitHub/DPPP2/30538-finalproject-smartmeters/"
-hl_path = "Helen's basepath"
-current_path = aj_path
+current_path = "C:/Users/amuly/OneDrive/Documents/GitHub/30538-finalproject-smartmeters/"
+
+## First, data is cleaned below. Shiny App code begins on line 67.
 
 # Load and preprocess data
 substations_UKPN = pd.read_csv(current_path + 'data/substations_UKPN.csv')
@@ -25,11 +24,11 @@ substations_UKPN['geometry'] = substations_UKPN.apply(lambda row: Point(row['lon
 substations_UKPN_gdf = gpd.GeoDataFrame(substations_UKPN, geometry='geometry')
 substations_UKPN_gdf.set_crs("EPSG:4326", inplace=True)
 
-# Load boundary data
+# Load boundary data for Bedford/Cambridge
 epn_boundaries = gpd.read_file(current_path + 'data/ukpn-epn-area-operational-boundaries/ukpn-epn-area-operational-boundaries.shp')
 bedford_cambridge = epn_boundaries[epn_boundaries['ops_area'] == 'Bedford/Cambridge']
 
-# Spatial join
+# Spatial join all substations on Bedford/Cambridge boundaries
 bedford_cambridge_substations = gpd.sjoin(
     substations_UKPN_gdf,
     bedford_cambridge,
@@ -37,7 +36,10 @@ bedford_cambridge_substations = gpd.sjoin(
     predicate='within'
 )
 
+# All substation names have a common precursor "UKPN_EPN-" which will be removed for analysis
 bedford_cambridge_substations['substation'] = bedford_cambridge_substations['substation'].apply(lambda s: s[9:])
+
+# Load EPN substation boundaries and clean up attribute names for analysis
 epn_substation_boundaries = gpd.read_file(current_path + "data/ukpn_secondary_postcode_area/ukpn_secondary_postcode_area.shp").rename(columns={
     "dno": "DNO",
     "sitefunctio": "site_functional_location",
@@ -49,6 +51,7 @@ epn_substation_boundaries = gpd.read_file(current_path + "data/ukpn_secondary_po
     "customer_co": "customer_count"
 })
 
+# Merge Bedford Cambridge substations on EPN substation boundaries
 bedford_cambridge_substations = epn_substation_boundaries.merge(
     bedford_cambridge_substations,
     left_on="site_functional_location",
@@ -57,7 +60,12 @@ bedford_cambridge_substations = epn_substation_boundaries.merge(
     suffixes=('_boundaries', '_substations')
 )
 
+# Convert to geodataframe
 bedford_cambridge_substations_gdf = gpd.GeoDataFrame(bedford_cambridge_substations, geometry='geometry_boundaries')
+
+
+
+## Using cleaned data, we can build the Shiny App below:
 
 # Time slider options
 time_options = (
