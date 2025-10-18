@@ -1,7 +1,7 @@
 ---
-title: "PPHA 30538 Final Project Plot 1"
-author: "Amulya Jasti (amjamz, Sec. 4), Sitong Guo (AnthonySigmar, Sec. 4), Helen Liu (helenriv, Sec. 3)"
-date: today
+title: "Bedford Cambridge Smart Meters Analysis"
+author: "Amulya Jasti (amjamz)"
+date: December 4, 2024
 format: 
   pdf:
     include-in-header: 
@@ -31,14 +31,10 @@ import pyarrow
 ```
 
 ```{python}
-#Can use these to change paths easily
-aj_path = "C:/Users/amuly/OneDrive/Documents/GitHub/30538-finalproject-smartmeters/"
-sg_path = "C:/Users/RedthinkerDantler/Documents/GitHub/DPPP2/30538-finalproject-smartmeters/"
-hl_path = "Helen's basepath"
-current_path = aj_path
+current_path = "C:/Users/amuly/OneDrive/Documents/GitHub/30538-finalproject-smartmeters/"
 ```
 
-Our smart meter data is from weave.energy and our shapefile data is from UK's National Energy System Operator (NESO).
+Smart meter data is from weave.energy and our shapefile data is from UK's National Energy System Operator (NESO).
 
 Step 1: Import and clean the data
 
