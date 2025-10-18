@@ -55,6 +55,6 @@ Future directions for research on electricity pricing and consumption analysis c
 Additionally, integrating demographic data, such as income levels, into the analysis can provide insights into how different socio-economic groups impact overall consumption. This would enable the development of income-based pricing models that cater to varying levels of energy use across different demographics. Finally, mapping high-consumption regions can help identify areas with significant energy demand, facilitating more strategic allocation of resources and potential implementation of localized demand response programs.
 
 ## Sources
-1. https://www.ofgem.gov.uk/get-smart-meter#:~:text=Smart%20meters%20are%20the%20new,when%20you%20can%20get%20one.
+1. https://www.ofgem.gov.uk/get-smart-meter
 2. https://www.theecoexperts.co.uk/solar-panels/kwh-electricity-prices
 3. https://doi.org/10.1016/j.enbuild.2023.113869
